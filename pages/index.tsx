@@ -3,6 +3,7 @@ import type { NextPage } from 'next'
 import Head from 'next/head'
 import { AppBar } from '../components/AppBar'
 import { CreateTokenAccount } from '../components/CreateTokenAccount'
+import { GetTokenBalance } from '../components/getTokenBalance'
 import { Minter } from '../components/minter'
 import { MintTokens } from '../components/mintTokens'
 import { TransferTokens } from '../components/TransferTokens'
@@ -29,6 +30,10 @@ const Home: NextPage = () => {
 
           <Box w={{ base: 'full', 'md': 'lg' }} color={'white'} mx={{ base: '0', md: '10' }} mb={10} bgColor={'slateblue'} p={5} borderRadius={'lg'}>
             <TransferTokens />
+          </Box>
+
+          <Box w={{ base: 'full', 'md': 'lg' }} color={'white'} mx={{ base: '0', md: '10' }} mb={10} bgColor={'slateblue'} p={5} borderRadius={'lg'}>
+            <GetTokenBalance />
           </Box>
         </Flex>
       </Box>

@@ -7,13 +7,12 @@ import { Box, Button, FormControl, FormLabel, Heading, Input, Link, NumberDecrem
 export const TransferTokens: FC = () => {
     const { connection } = useConnection();
     const { publicKey, sendTransaction } = useWallet();
-    const [tokenAccount, setTokenAccount] = useState("");
     const [balance, setBalance] = useState("");
     const [txSig, setTxSig] = useState('');
 
     const link = () => { return txSig ? `https://explorer.solana.com/tx/${txSig}?cluster=devnet` : "" }
 
-    const mintTokenTx = async (event: any) => {
+    const transferTokenTx = async (event: any) => {
         event.preventDefault();
 
         if (!connection || !publicKey) {
@@ -23,9 +22,16 @@ export const TransferTokens: FC = () => {
         const mint = new web3.PublicKey(event.target.mint.value);
         const receipent = new web3.PublicKey(event.target.receipent.value);
         const amount = event.target.amount.value;
-        console.log(amount);
 
-        const associatedTokenAddress = await token.getAssociatedTokenAddress(
+        const associatedTokenAddressSender = await token.getAssociatedTokenAddress(
+            mint,
+            publicKey,
+            false,
+            token.TOKEN_PROGRAM_ID,
+            token.ASSOCIATED_TOKEN_PROGRAM_ID
+        )
+
+        const associatedTokenAddressReceiver = await token.getAssociatedTokenAddress(
             mint,
             receipent,
             false,
@@ -34,26 +40,20 @@ export const TransferTokens: FC = () => {
         )
 
         const transaction = new web3.Transaction().add(
-            token.createMintToInstruction(
-                mint,
-                associatedTokenAddress,
+            token.createTransferInstruction(
+                associatedTokenAddressSender,
+                associatedTokenAddressReceiver,
                 publicKey,
                 amount
             )
         )
 
-        sendTransaction(
-            transaction,
-            connection
-        ).then((sig) => {
+        sendTransaction(transaction, connection).then(async (sig) => {
             setTxSig(sig)
-            setTokenAccount(associatedTokenAddress.toString());
 
-            token.getAccount(connection, associatedTokenAddress).then((account) => {
-                setBalance(account.amount.toString());
-            });
+            const account = await token.getAccount(connection, associatedTokenAddressSender);
+            setBalance(account.amount.toString());
         })
-
 
     }
 
@@ -62,7 +62,20 @@ export const TransferTokens: FC = () => {
             <Heading size={'lg'} mb={4}>
                 Transfer your Tokens
             </Heading>
-            <form onSubmit={mintTokenTx}>
+            <form onSubmit={transferTokenTx}>
+                <FormControl>
+                    <FormLabel htmlFor="mint">
+                        Token Mint:
+                    </FormLabel>
+                    <Input
+                        focusBorderColor="white"
+                        id="mint"
+                        placeholder="Enter the mint address"
+                        _placeholder={{ color: 'white', opacity: '0.9' }}
+                        color='gray.200'
+                    />
+                </FormControl>
+
                 <FormControl mt={5}>
                     <FormLabel htmlFor="receipent">
                         Receipent
