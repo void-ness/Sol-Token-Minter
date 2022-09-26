@@ -1,10 +1,11 @@
-import { Center, Box, Heading } from '@chakra-ui/react'
+import { Center, Box, Heading, Flex, Spacer } from '@chakra-ui/react'
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import { AppBar } from '../components/AppBar'
 import { CreateTokenAccount } from '../components/CreateTokenAccount'
 import { Minter } from '../components/minter'
 import { MintTokens } from '../components/mintTokens'
+import { TransferTokens } from '../components/TransferTokens'
 import styles from '../styles/Home.module.css'
 
 const Home: NextPage = () => {
@@ -15,22 +16,22 @@ const Home: NextPage = () => {
         <title>Token Minter</title>
       </Head>
 
-      <Center>
-        <Box>
-          <Heading as="h1" size="lg" color="white" ml={4} mt={8} mb={4}>
-            <Minter />
-          </Heading>
-
-          <Heading as="h1" size="lg" color="white" ml={4} mt={8} mb={4}>
+      <Box w={'full'}>
+        <Minter />
+        <Flex width={'80%'} mx='auto' mt='10' wrap={'wrap'} justifyContent={{ base: "center", md: 'space-between' }}>
+          <Box w={{ base: 'full', 'md': 'lg' }} color={'white'} mx={{ base: '0', md: '10' }} mb={10} bgColor={'slateblue'} p={5} borderRadius={'lg'}>
             <CreateTokenAccount />
-          </Heading>
-
-          <Heading as="h1" size="lg" color="white" ml={4} mt={8} mb={4}>
+          </Box>
+          <Spacer />
+          <Box w={{ base: 'full', 'md': 'lg' }} color={'white'} mx={{ base: '0', md: '10' }} mb={10} bgColor={'slateblue'} p={5} borderRadius={'lg'}>
             <MintTokens />
-          </Heading>
+          </Box>
 
-        </Box>
-      </Center>
+          <Box w={{ base: 'full', 'md': 'lg' }} color={'white'} mx={{ base: '0', md: '10' }} mb={10} bgColor={'slateblue'} p={5} borderRadius={'lg'}>
+            <TransferTokens />
+          </Box>
+        </Flex>
+      </Box>
     </div>
   )
 }

@@ -2,6 +2,7 @@ import { FC, useState, useEffect } from 'react'
 import * as web3 from '@solana/web3.js'
 import * as token from '@solana/spl-token'
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
+import { Box, Button, Center, Flex, Link, Spacer, Text } from '@chakra-ui/react'
 
 export const Minter: FC = () => {
     const { connection } = useConnection();
@@ -71,27 +72,42 @@ export const Minter: FC = () => {
 
     return (
         <>
-            <div>
-                <p>{publicKey ? `SOL Balance: ${balance / web3.LAMPORTS_PER_SOL}` : ""}</p>
-            </div>
+            <Box color='white' fontWeight={'semibold'} px={{ base: '2', md: '7' }} mt={5} textAlign={'center'} w={{ base: '90%', md: 'full' }} mx="auto">
+                <Flex justifyContent={'center'} alignItems={'center'}>
+                    {publicKey ? (
+                        <form onSubmit={createMint}>
+                            <Button
+                                type='submit'
+                                colorScheme={'purple'}
+                                width={{ base: '30', md: '40' }}
+                                height={{ base: '10', md: '12' }}
+                                fontSize={'lg'}
+                            >
+                                Create Mint
+                            </Button>
+                        </form>
+                    ) : (
+                        <Text fontSize={{ base: 'lg', md: '3xl' }}>
+                            Connect Your Wallet
+                        </Text>
+                    )}
 
-            {publicKey ? (
-                <form onSubmit={createMint}>
-                    <button type="submit">
-                        Create Mint
-                    </button>
-                </form>
-            ) : (
-                <span>Connect Your Wallet</span>
-            )}
+                    <Spacer />
 
-            {tx ? (
-                <div>
-                    <p>Minted account address: ${mint}</p>
-                    <p>view the transaction on </p>
-                    <a href={link()}>Solana Explorer</a>
-                </div>
-            ) : null}
+                    <div>
+                        <Text fontSize={{ base: 'xl', md: '3xl' }}>
+                            {publicKey ? `Balance: ${(balance / web3.LAMPORTS_PER_SOL).toPrecision(3)} SOLs` : ""}
+                        </Text>
+                    </div>
+                </Flex>
+
+                {tx ? (
+                    <Box textAlign={'left'} fontSize={{ base: 'md', md: 'lg' }} mt={8} color='gray.300'>
+                        <Text>Minted account address: <b>{mint}</b></Text>
+                        <Text mt={3}>View the transaction on <Link href={link()} color='gray.50'>Solana Explorer</Link></Text>
+                    </Box>
+                ) : null}
+            </Box>
         </>
     )
 }

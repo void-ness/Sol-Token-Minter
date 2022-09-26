@@ -2,7 +2,7 @@ import { FC, useState, useEffect } from "react";
 import * as web3 from '@solana/web3.js'
 import * as token from '@solana/spl-token'
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { Button, FormControl, FormLabel, Input } from "@chakra-ui/react";
+import { Box, Button, FormControl, FormLabel, Heading, Input, Link, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Text } from "@chakra-ui/react";
 
 export const MintTokens: FC = () => {
     const { connection } = useConnection();
@@ -23,6 +23,7 @@ export const MintTokens: FC = () => {
         const mint = new web3.PublicKey(event.target.mint.value);
         const receipent = new web3.PublicKey(event.target.receipent.value);
         const amount = event.target.amount.value;
+        console.log(amount);
 
         const associatedTokenAddress = await token.getAssociatedTokenAddress(
             mint,
@@ -47,21 +48,31 @@ export const MintTokens: FC = () => {
         ).then((sig) => {
             setTxSig(sig)
             setTokenAccount(associatedTokenAddress.toString());
+
+            token.getAccount(connection, associatedTokenAddress).then((account) => {
+                setBalance(account.amount.toString());
+            });
         })
 
-        const account = await token.getAccount(connection, associatedTokenAddress);
-        setBalance(account.amount.toString());
+
     }
 
     return (
-        <div>
+        <Box>
+            <Heading size={'lg'} mb={4}>
+                Mint your Tokens
+            </Heading>
             <form onSubmit={mintTokenTx}>
                 <FormControl>
                     <FormLabel htmlFor="mint">
                         Token Mint:
                     </FormLabel>
                     <Input
+                        focusBorderColor="white"
                         id="mint"
+                        placeholder="Enter the mint address"
+                        _placeholder={{ color: 'white', opacity: '0.9' }}
+                        color='gray.200'
                     />
                 </FormControl>
 
@@ -70,20 +81,29 @@ export const MintTokens: FC = () => {
                         Receipent
                     </FormLabel>
                     <Input
+                        focusBorderColor="white"
                         id="receipent"
+                        placeholder="Enter the account owner public key"
+                        _placeholder={{ color: 'white', opacity: '0.9' }}
+                        color='gray.200'
                     />
                 </FormControl>
 
                 <FormControl mt={5}>
-                    <FormLabel htmlFor="amount">
-                        Tokens to Mint
+                    <FormLabel htmlFor="receipent">
+                        Amount of Tokens
                     </FormLabel>
-                    <Input
-                        id="amount"
-                    />
+                    <NumberInput defaultValue={1} step={1} id='amount' w={'3xs'}>
+                        <NumberInputField />
+                        <NumberInputStepper>
+                            <NumberIncrementStepper />
+                            <NumberDecrementStepper />
+                        </NumberInputStepper>
+                    </NumberInput>
                 </FormControl>
 
                 <Button
+                    isDisabled={publicKey ? false : true}
                     type="submit"
                     color={'gray.700'}
                     mt={5}
@@ -93,12 +113,11 @@ export const MintTokens: FC = () => {
             </form>
 
             {txSig ? (
-                <div>
-                    <p>Token Balance: {balance} </p>
-                    <p>view the newly created token account transaction from</p>
-                    <a href={link()}>here</a>
-                </div>
+                <Box textAlign={'left'} fontSize="md" mt={5} color='gray.300'>
+                    <Text>Token Balance: <br /> <b>{balance}</b></Text>
+                    <Text mt={3}>View the transaction on <Link href={link()} color='gray.50'>Solana Explorer</Link></Text>
+                </Box>
             ) : null}
-        </div>
+        </Box>
     )
 }
